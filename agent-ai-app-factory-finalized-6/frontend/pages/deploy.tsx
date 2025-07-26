@@ -12,7 +12,7 @@ export default function DeployPage() {
   const [repoName, setRepoName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ repoUrl: string; liveUrl: string } | null>(null);
+  const [result, setResult] = useState<{ repoUrl: string; liveUrl: string; zipBase64: string } | null>(null);
 
   // Load generated code from localStorage
   function loadCode(): Record<string, string> | null {
@@ -94,6 +94,16 @@ export default function DeployPage() {
             Live URL: {' '}
             <a href={result.liveUrl} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
               {result.liveUrl}
+            </a>
+          </p>
+          <p>
+            Download ZIP:{' '}
+            <a
+              href={`data:application/zip;base64,${result.zipBase64}`}
+              download="workspace.zip"
+              className="text-blue-600 hover:underline"
+            >
+              workspace.zip
             </a>
           </p>
           <Link
