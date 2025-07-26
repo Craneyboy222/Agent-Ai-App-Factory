@@ -17,7 +17,8 @@
     "@prisma/client": "^5.0.0",
     "@supabase/supabase-js": "^2.0.0",
     "@octokit/rest": "^20.0.0",
-    "@vercel/client": "^15.3.13"
+    "@vercel/client": "^15.3.13",
+    "google-trends-api": "^4.9.2"
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
