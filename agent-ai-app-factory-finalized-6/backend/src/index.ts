@@ -1,5 +1,17 @@
 import express from 'express';
 import cors from 'cors';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const {
+  ENVATO_TOKEN,
+  REDDIT_USER_AGENT
+} = process.env;
+
+if (!ENVATO_TOKEN) {
+  console.warn('ENVATO_TOKEN not set - CodeCanyon results will be skipped');
+}
 
 // Import agent functions relative to backend/src
 // Using relative path via two directories up to the shared `agents` folder
