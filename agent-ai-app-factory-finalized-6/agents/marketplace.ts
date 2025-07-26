@@ -1,4 +1,5 @@
 import { Configuration, OpenAIApi } from 'openai';
+import axios from 'axios';
 
 interface Listing {
   title: string;
@@ -7,12 +8,56 @@ interface Listing {
   features: string[];
   pricing: string;
   screenshots: string[];
+  flippaUrl?: string;
+  internalUrl?: string;
 }
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+
+/**
+ * Create a listing on Flippa using their public API. Returns the URL of the
+ * new listing. Environment variables required:
+ *   - FLIPPA_API_KEY
+ *   - FLIPPA_API_URL (optional, defaults to the v3 endpoint)
+ */
+export async function createFlippaListing(listing: Listing): Promise<string> {
+  const apiKey = process.env.FLIPPA_API_KEY;
+  const baseUrl = process.env.FLIPPA_API_URL || 'https://api.flippa.com/v3/listings';
+  if (!apiKey) {
+    throw new Error('Missing FLIPPA_API_KEY');
+  }
+  try {
+    const res = await axios.post(baseUrl, listing, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    return res.data?.url || '';
+  } catch (err) {
+    console.error('Failed to create Flippa listing:', err);
+    throw err;
+  }
+}
+
+/**
+ * Publish the listing to the internal marketplace API. The endpoint URL should
+ * be provided via the INTERNAL_MARKETPLACE_URL environment variable and must
+ * return the created listing with a `url` field.
+ */
+export async function createInternalListing(listing: Listing): Promise<string> {
+  const url = process.env.INTERNAL_MARKETPLACE_URL;
+  if (!url) {
+    throw new Error('Missing INTERNAL_MARKETPLACE_URL');
+  }
+  try {
+    const res = await axios.post(`${url.replace(/\/$/, '')}/listings`, listing);
+    return res.data?.url || '';
+  } catch (err) {
+    console.error('Failed to create internal listing:', err);
+    throw err;
+  }
+}
 
 /**
  * Generate a sales page listing for the given application.  Uses the

@@ -8,6 +8,8 @@ interface Listing {
   features: string;
   pricing: string;
   screenshots: string[];
+  flippaUrl?: string;
+  internalUrl?: string;
 }
 
 /**
@@ -95,6 +97,36 @@ export default function ListingPage() {
                   />
                 ))}
               </div>
+            </div>
+          )}
+          {(listing.flippaUrl || listing.internalUrl) && (
+            <div>
+              {listing.flippaUrl && (
+                <p>
+                  Flippa Listing:{' '}
+                  <a
+                    href={listing.flippaUrl}
+                    className="text-blue-600 underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {listing.flippaUrl}
+                  </a>
+                </p>
+              )}
+              {listing.internalUrl && (
+                <p>
+                  Internal Listing:{' '}
+                  <a
+                    href={listing.internalUrl}
+                    className="text-blue-600 underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {listing.internalUrl}
+                  </a>
+                </p>
+              )}
             </div>
           )}
         </div>
