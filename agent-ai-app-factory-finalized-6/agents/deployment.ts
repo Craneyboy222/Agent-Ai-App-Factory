@@ -1,5 +1,6 @@
 import { Octokit } from '@octokit/rest';
 import { VercelClient } from '@vercel/client';
+import archiver from 'archiver';
 
 /**
  * Deploy the generated app to a new GitHub repository and Vercel.
@@ -20,7 +21,7 @@ import { VercelClient } from '@vercel/client';
 export async function deployApp(
   code: Record<string, string>,
   repoName: string
-): Promise<{ repoUrl: string; liveUrl: string }> {
+): Promise<{ repoUrl: string; liveUrl: string; zipBase64: string }> {
   const githubToken = process.env.GITHUB_TOKEN;
   const vercelToken = process.env.VERCEL_TOKEN;
   if (!githubToken || !vercelToken) {
@@ -85,5 +86,20 @@ export async function deployApp(
     teamId: teamId || undefined,
   });
   const liveUrl = deployment.url;
-  return { repoUrl, liveUrl };
+  // 3. Package the workspace into a ZIP archive
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  const buffers: Buffer[] = [];
+  archive.on('data', (d) => buffers.push(d));
+  const finalize = new Promise<void>((resolve, reject) => {
+    archive.on('end', () => resolve());
+    archive.on('error', (err) => reject(err));
+  });
+  for (const [filePath, content] of Object.entries(code)) {
+    archive.append(content, { name: filePath });
+  }
+  archive.finalize();
+  await finalize;
+  const zipBase64 = Buffer.concat(buffers).toString('base64');
+
+  return { repoUrl, liveUrl, zipBase64 };
 }
