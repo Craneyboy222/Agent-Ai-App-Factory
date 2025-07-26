@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
 
@@ -10,7 +10,14 @@ import Link from 'next/link';
 export default function QaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [output, setOutput] = useState<string | null>(null);
+  const [output, setOutput] = useState<string>('');
+  const poller = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (poller.current) clearInterval(poller.current);
+    };
+  }, []);
 
   function loadCode(): Record<string, string> | null {
     if (typeof window === 'undefined') return null;
@@ -31,17 +38,37 @@ export default function QaPage() {
     }
     setLoading(true);
     setError(null);
-    setOutput(null);
+    setOutput('');
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
       const url = baseUrl ? `${baseUrl}/api/qa` : '/api/qa';
       const res = await axios.post(url, { code });
-      setOutput(res.data.output);
+      const jobId = res.data.jobId;
+      const pollUrl = baseUrl ? `${baseUrl}/api/qa/${jobId}` : `/api/qa/${jobId}`;
+      poller.current = setInterval(async () => {
+        try {
+          const resp = await axios.get(pollUrl);
+          setOutput(resp.data.output);
+          if (resp.data.done && poller.current) {
+            clearInterval(poller.current);
+            poller.current = null;
+            setLoading(false);
+          }
+        } catch (err: any) {
+          console.error(err);
+          if (poller.current) clearInterval(poller.current);
+          setLoading(false);
+          setError(
+            err?.response?.data?.message || err?.message || 'Failed to fetch progress'
+          );
+        }
+      }, 1000);
     } catch (err: any) {
       console.error(err);
-      setError(err?.response?.data?.message || err?.message || 'Failed to run tests');
-    } finally {
+      setError(err?.response?.data?.message || err?.message || 'Failed to start tests');
       setLoading(false);
+    } finally {
+      // Poller cleanup is handled by useEffect cleanup
     }
   }
 

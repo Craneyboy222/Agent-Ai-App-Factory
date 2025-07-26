@@ -47,3 +47,31 @@ export async function generateCodebase(spec: Specification): Promise<Record<stri
     throw error;
   }
 }
+
+/**
+ * Attempt to fix a codebase using failing test diagnostics. The updated files
+ * are returned in the same JSON mapping format as {@link generateCodebase}.
+ */
+export async function improveCodebase(
+  code: Record<string, string>,
+  diagnostics: string
+): Promise<Record<string, string>> {
+  const prompt = `You previously generated the following project as JSON where keys are file paths and values are file contents:\n` +
+    `${JSON.stringify(code)}\n\n` +
+    `Tests produced the following diagnostics:\n${diagnostics}\n\n` +
+    `Update the project so all tests pass. Return ONLY the updated project JSON without explanations.`;
+
+  const response = await openai.createChatCompletion({
+    model: 'gpt-4o',
+    messages: [{ role: 'user', content: prompt }],
+    temperature: 0.3,
+  });
+
+  const content = response.data.choices[0].message?.content || '{}';
+  try {
+    return JSON.parse(content) as Record<string, string>;
+  } catch (error) {
+    console.error('Failed to parse improved code JSON:', content);
+    throw error;
+  }
+}

@@ -25,6 +25,13 @@ import { getAnalytics } from '../../agents/feedback';
 
 const app = express();
 
+interface QaJob {
+  output: string[];
+  done: boolean;
+}
+
+const qaJobs = new Map<string, QaJob>();
+
 // Middleware
 app.use(cors());
 app.use(express.json());
@@ -98,12 +105,40 @@ app.post('/api/qa', async (req, res) => {
   if (!code) {
     return res.status(400).json({ message: 'Missing code.' });
   }
-  try {
-    const output = await runTests(code);
-    res.json({ output });
-  } catch (error: any) {
-    console.error('QA agent error:', error);
-    res.status(500).json({ message: error.message || 'Tests failed.' });
+
+  const jobId = Date.now().toString();
+  qaJobs.set(jobId, { output: [], done: false });
+
+  runTests(code, msg => {
+    const job = qaJobs.get(jobId);
+    if (job) job.output.push(msg);
+  })
+    .then(result => {
+      const job = qaJobs.get(jobId);
+      if (job) {
+        job.output.push(result.output);
+        job.done = true;
+      }
+    })
+    .catch(err => {
+      const job = qaJobs.get(jobId);
+      if (job) {
+        job.output.push(err.message || 'Tests failed.');
+        job.done = true;
+      }
+    });
+
+  res.json({ jobId });
+});
+
+app.get('/api/qa/:id', (req, res) => {
+  const job = qaJobs.get(req.params.id);
+  if (!job) {
+    return res.status(404).json({ message: 'Job not found.' });
+  }
+  res.json({ output: job.output.join('\n'), done: job.done });
+  if (job.done) {
+    qaJobs.delete(req.params.id);
   }
 });
 
