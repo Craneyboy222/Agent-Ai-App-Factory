@@ -20,7 +20,7 @@ import { generateSpecification } from '../../agents/specification';
 import { generateCodebase } from '../../agents/codeGeneration';
 import { deployApp } from '../../agents/deployment';
 import { runTests } from '../../agents/qa';
-import { generateListing } from '../../agents/marketplace';
+import { generateListing, createFlippaListing, createInternalListing } from '../../agents/marketplace';
 import { getAnalytics } from '../../agents/feedback';
 
 const app = express();
@@ -152,7 +152,25 @@ app.post('/api/listing', async (req, res) => {
   }
   try {
     const listing = await generateListing(spec, liveUrl);
-    res.json(listing);
+
+    let flippaUrl: string | null = null;
+    let internalUrl: string | null = null;
+
+    try {
+      flippaUrl = await createFlippaListing(listing);
+      listing.flippaUrl = flippaUrl;
+    } catch (err) {
+      console.error('Flippa listing error:', err);
+    }
+
+    try {
+      internalUrl = await createInternalListing(listing);
+      listing.internalUrl = internalUrl;
+    } catch (err) {
+      console.error('Internal marketplace error:', err);
+    }
+
+    res.json({ ...listing, flippaUrl, internalUrl });
   } catch (error: any) {
     console.error('Marketplace agent error:', error);
     res.status(500).json({ message: error.message || 'Failed to generate listing.' });
