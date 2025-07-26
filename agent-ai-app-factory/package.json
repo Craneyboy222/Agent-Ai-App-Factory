@@ -1,8 +1,0 @@
-{
-  "name": "agent-ai-app-factory",
-  "private": true,
-  "workspaces": [
-    "frontend",
-    "backend"
-  ]
-}
