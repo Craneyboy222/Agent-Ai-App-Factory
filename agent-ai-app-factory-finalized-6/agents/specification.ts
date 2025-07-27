@@ -12,7 +12,7 @@ export interface Specification {
 // Initialise an OpenAI client using the API key from the environment.  The
 // environment variable OPENAI_API_KEY must be set when running the backend.
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 /**

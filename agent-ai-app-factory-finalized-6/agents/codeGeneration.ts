@@ -3,7 +3,7 @@ import { Specification } from './specification';
 
 // Set up OpenAI client with API key from environment
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || '',
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
 /**
