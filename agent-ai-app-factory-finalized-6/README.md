@@ -16,6 +16,7 @@ Agents live in the top‑level `agents` directory so they can be imported by bot
 - An OpenAI API key and access to a Supabase/PostgreSQL database
 
 Other environment variables are optional but recommended for deployment and marketplace integrations. See `.env.example` for the full list.
+The `APIFY_API_TOKEN` variable allows the market research agent to query the Apify Flippa actor for current listings.
 
 ## Installation
 

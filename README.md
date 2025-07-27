@@ -21,6 +21,7 @@ Key variables include:
 
 - `FLIPPA_API_KEY` – the personal API token used to create listings on Flippa. Generate this key from your Flippa account and place it in the `.env` file.
 - `FLIPPA_API_URL` – the base URL of the Flippa listing API. The default `https://api.flippa.com/v3/listings` works for production but can be adjusted if Flippa provides an alternative endpoint.
+- `APIFY_API_TOKEN` – token for the Apify Flippa actor used by the market research agent to fetch listings.
 - `INTERNAL_MARKETPLACE_URL` – the root address of your internal marketplace where generated apps are published. Set it to your own marketplace’s URL in the `.env` file.
 - `NEXT_PUBLIC_API_BASE_URL` – base URL used by the frontend to reach the backend API. Defaults to `http://localhost:4000` for local development.
 

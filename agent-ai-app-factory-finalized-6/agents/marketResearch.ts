@@ -27,27 +27,21 @@ export interface AppIdea {
  * price and URL back to Flippa.  Returns up to ~50 listings from the first page.
  */
 export async function scrapeFlippa(): Promise<AppIdea[]> {
+  const token = process.env.APIFY_API_TOKEN;
+  if (!token) {
+    throw new Error('Missing APIFY_API_TOKEN');
+  }
   try {
-    const response = await axios.get('https://flippa.com/marketplace/websites');
-    const $ = cheerio.load(response.data);
-    const ideas: AppIdea[] = [];
-    $('.tile-title').each((_, element) => {
-      const title = $(element).text().trim();
-      const description = $(element)
-        .next('.tile-description')
-        .text()
-        .trim();
-      const priceText = $(element)
-        .nextAll('.tile-price')
-        .first()
-        .text()
-        .replace(/[\$,]/g, '')
-        .trim();
-      const price = priceText ? parseFloat(priceText) : undefined;
-      const url = $(element).closest('a').attr('href') || '';
-      ideas.push({ title, description, price, url });
-    });
-    return ideas;
+    const url =
+      `https://api.apify.com/v2/actor-tasks/apify~flippa/run-sync-get-dataset-items?token=${token}`;
+    const response = await axios.get(url);
+    const items = response.data || [];
+    return items.map((item: any) => ({
+      title: item.title,
+      description: item.description || '',
+      price: item.price,
+      url: item.url,
+    }));
   } catch (error) {
     console.error('Error scraping Flippa:', error);
     return [];
