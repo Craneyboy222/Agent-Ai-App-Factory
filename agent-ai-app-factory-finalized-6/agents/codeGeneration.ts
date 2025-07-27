@@ -1,11 +1,10 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import { Specification } from './specification';
 
 // Set up OpenAI client with API key from environment
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * Generate a full stack codebase based off of a technical specification.  The
@@ -31,7 +30,7 @@ export async function generateCodebase(spec: Specification): Promise<Record<stri
     + `Implement unit tests with Jest and end‑to‑end tests with Playwright.\n`
     + `Return the entire project as a JSON object where keys are file paths (including src/ prefixes) and values are the file contents.  Do not include code fences or extra commentary.\n`;
 
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
       { role: 'user', content: prompt }
@@ -39,7 +38,7 @@ export async function generateCodebase(spec: Specification): Promise<Record<stri
     temperature: 0.3,
   });
 
-  const content = response.data.choices[0].message?.content || '{}';
+  const content = response.choices[0].message?.content || '{}';
   try {
     return JSON.parse(content) as Record<string, string>;
   } catch (error) {
@@ -61,13 +60,13 @@ export async function improveCodebase(
     `Tests produced the following diagnostics:\n${diagnostics}\n\n` +
     `Update the project so all tests pass. Return ONLY the updated project JSON without explanations.`;
 
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.3,
   });
 
-  const content = response.data.choices[0].message?.content || '{}';
+  const content = response.choices[0].message?.content || '{}';
   try {
     return JSON.parse(content) as Record<string, string>;
   } catch (error) {
