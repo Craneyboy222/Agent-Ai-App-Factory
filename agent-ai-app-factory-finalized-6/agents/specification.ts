@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 
 export interface Specification {
   features: string[];
@@ -11,10 +11,9 @@ export interface Specification {
 
 // Initialise an OpenAI client using the API key from the environment.  The
 // environment variable OPENAI_API_KEY must be set when running the backend.
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * Generate a comprehensive technical specification for a given app idea.  The
@@ -34,7 +33,7 @@ export async function generateSpecification(idea: string): Promise<Specification
     + `{\n  "features": string[],\n  "databaseSchema": string,\n  "apiSpec": string,\n  "wireframes": string,\n  "monetization": string,\n  "techStack": string\n}`
     + `\n\nDo not include any prose outside of the JSON; return only the JSON object.`;
 
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [
       {
@@ -45,7 +44,7 @@ export async function generateSpecification(idea: string): Promise<Specification
     temperature: 0.4,
   });
 
-  const message = response.data.choices[0].message?.content || '{}';
+  const message = response.choices[0].message?.content || '{}';
   try {
     return JSON.parse(message) as Specification;
   } catch (error) {

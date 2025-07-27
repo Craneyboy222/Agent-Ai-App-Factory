@@ -89,10 +89,10 @@ export async function deployApp(
   // 3. Package the workspace into a ZIP archive
   const archive = archiver('zip', { zlib: { level: 9 } });
   const buffers: Buffer[] = [];
-  archive.on('data', (d) => buffers.push(d));
+  archive.on('data', (d: Buffer) => buffers.push(d));
   const finalize = new Promise<void>((resolve, reject) => {
     archive.on('end', () => resolve());
-    archive.on('error', (err) => reject(err));
+    archive.on('error', (err: Error) => reject(err));
   });
   for (const [filePath, content] of Object.entries(code)) {
     archive.append(content, { name: filePath });

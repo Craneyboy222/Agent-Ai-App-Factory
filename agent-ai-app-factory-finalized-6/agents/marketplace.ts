@@ -1,4 +1,4 @@
-import { Configuration, OpenAIApi } from 'openai';
+import OpenAI from 'openai';
 import axios from 'axios';
 
 interface Listing {
@@ -12,10 +12,9 @@ interface Listing {
   internalUrl?: string;
 }
 
-const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY,
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY || '',
 });
-const openai = new OpenAIApi(configuration);
 
 /**
  * Create a listing on Flippa using their public API. Returns the URL of the
@@ -76,11 +75,11 @@ export async function generateListing(
     + `Live demo: ${liveUrl}\n\n`
     + `Return your answer as valid JSON with the following structure:\n`
     + `{\n  "title": string,\n  "tagline": string,\n  "description": string,\n  "features": string[],\n  "pricing": string,\n  "screenshots": string[]\n}`;
-  const response = await openai.createChatCompletion({
+  const response = await openai.chat.completions.create({
     model: 'gpt-4o',
     messages: [{ role: 'user', content: prompt }],
     temperature: 0.7,
   });
-  const content = response.data.choices[0].message?.content || '{}';
+  const content = response.choices[0].message?.content || '{}';
   return JSON.parse(content) as Listing;
 }
