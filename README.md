@@ -29,6 +29,7 @@ The following variables are used by the agents and backend services:
 - `SUPABASE_SERVICE_ROLE_KEY` – service role key for Supabase.
 - `ENVATO_TOKEN` – token for CodeCanyon scraping.
 - `REDDIT_USER_AGENT` – user agent string for Reddit requests.
+- `PORT` – port for the backend server (defaults to 4000).
 - `FLIPPA_API_KEY` – API key for creating Flippa listings.
 - `FLIPPA_API_URL` – *(optional)* override for the Flippa API base URL.
 - `INTERNAL_MARKETPLACE_URL` – endpoint for your internal marketplace.
