@@ -105,22 +105,30 @@ export async function scrapeCodeCanyon(): Promise<AppIdea[]> {
 }
 
 /**
- * Retrieve trending search topics from Google Trends using the
- * `google-trends-api` package.
+ * Retrieve trending search topics from Zenserp's trends endpoint.
+ * Requires ZENSERP_API_KEY to be set. Falls back to an empty
+ * array when the key is missing or the request fails.
  */
 export async function scrapeGoogleTrends(): Promise<AppIdea[]> {
+  const apiKey = process.env.ZENSERP_API_KEY;
+  if (!apiKey) {
+    console.warn('Missing ZENSERP_API_KEY, skipping Google Trends scrape');
+    return [];
+  }
   try {
-    const googleTrends = await import('google-trends-api');
-    const result = await googleTrends.dailyTrends({ geo: 'US' });
-    const data = JSON.parse(result as unknown as string);
-    const days = data.default.trendingSearchesDays || [];
-    const searches = days[0]?.trendingSearches || [];
+    const resp = await axios.get('https://app.zenserp.com/api/v2/trends', {
+      params: { apikey: apiKey, gl: 'US' }
+    });
+    const searches =
+      resp.data?.trendingSearchesDays?.[0]?.trendingSearches ||
+      resp.data?.trendingSearches ||
+      [];
     return searches.slice(0, 10).map((s: any) => ({
-      title: s.title.query,
-      description: s.snippet || '',
-      url: s.shareUrl,
+      title: s.title?.query || s.title || '',
+      description: s.snippet || s.description || '',
+      url: s.shareUrl || s.url,
       metrics: s.formattedTraffic
-        ? { trendScore: parseInt(s.formattedTraffic.replace(/\D/g, '')) }
+        ? { trendScore: parseInt(String(s.formattedTraffic).replace(/\D/g, '')) }
         : undefined
     }));
   } catch (error) {

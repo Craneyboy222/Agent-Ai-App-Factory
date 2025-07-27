@@ -17,6 +17,7 @@ Agents live in the top‑level `agents` directory so they can be imported by bot
 
 Other environment variables are optional but recommended for deployment and marketplace integrations. See `.env.example` for the full list.
 The `APIFY_API_TOKEN` variable allows the market research agent to query the Apify Flippa actor for current listings.
+The `ZENSERP_API_KEY` variable enables the Google Trends scraper to call Zenserp for trending data.
 
 ## Installation
 
