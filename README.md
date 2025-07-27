@@ -17,6 +17,12 @@ npm install
 
 Copy `.env.example` to `.env` in the repository root and fill in the required keys.
 
+Key variables include:
+
+- `FLIPPA_API_KEY` – authentication token for creating listings on Flippa.
+- `FLIPPA_API_URL` – base URL of the Flippa API used when posting listings.
+- `INTERNAL_MARKETPLACE_URL` – URL of the private marketplace where generated apps are published.
+
 ### Running the backend
 
 ```bash
