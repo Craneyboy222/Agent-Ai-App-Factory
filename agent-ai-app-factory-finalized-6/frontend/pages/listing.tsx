@@ -5,6 +5,7 @@ interface Listing {
   title: string;
   tagline: string;
   description: string;
+  // Features are stored as a list of strings
   features: string[];
   pricing: string;
   screenshots: string[];
@@ -76,9 +77,7 @@ export default function ListingPage() {
           <div>
             <h3 className="font-semibold mb-1">Features</h3>
             <pre className="bg-gray-100 p-3 rounded whitespace-pre-wrap text-sm">
-              {Array.isArray(listing.features)
-                ? listing.features.join('\n')
-                : listing.features}
+              {listing.features.join('\n')}
             </pre>
           </div>
           <div>
