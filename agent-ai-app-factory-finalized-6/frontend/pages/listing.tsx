@@ -5,7 +5,7 @@ interface Listing {
   title: string;
   tagline: string;
   description: string;
-  features: string;
+  features: string[];
   pricing: string;
   screenshots: string[];
   flippaUrl?: string;
@@ -76,7 +76,9 @@ export default function ListingPage() {
           <div>
             <h3 className="font-semibold mb-1">Features</h3>
             <pre className="bg-gray-100 p-3 rounded whitespace-pre-wrap text-sm">
-              {listing.features}
+              {Array.isArray(listing.features)
+                ? listing.features.join('\n')
+                : listing.features}
             </pre>
           </div>
           <div>
