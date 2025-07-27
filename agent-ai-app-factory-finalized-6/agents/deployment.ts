@@ -1,5 +1,7 @@
 import { Octokit } from '@octokit/rest';
-import { VercelClient } from '@vercel/client';
+import { createDeployment } from '@vercel/client';
+import fs from 'fs/promises';
+import path from 'path';
 import archiver from 'archiver';
 
 /**
@@ -73,19 +75,38 @@ export async function deployApp(
   // Update the branch reference to the new commit
   await octokit.git.updateRef({ owner, repo: repoName, ref: 'heads/main', sha: commit.data.sha });
 
-  // 2. Trigger Vercel deployment
-  const vercel = new VercelClient({ token: vercelToken });
-  const teamId = process.env.VERCEL_TEAM;
-  const deployment = await vercel.deployProject({
-    repo: {
-      type: 'github',
-      repo: `${owner}/${repoName}`,
-    },
-    name: repoName,
-    target: 'production',
-    teamId: teamId || undefined,
-  });
-  const liveUrl = deployment.url;
+  // 2. Trigger Vercel deployment using `createDeployment`
+  let liveUrl = '';
+  const tempDir = await fs.mkdtemp(path.join(process.cwd(), 'vercel-deploy-'));
+  try {
+    await Promise.all(
+      Object.entries(code).map(([filePath, content]) => {
+        const fullPath = path.join(tempDir, filePath);
+        return fs
+          .mkdir(path.dirname(fullPath), { recursive: true })
+          .then(() => fs.writeFile(fullPath, content));
+      })
+    );
+
+    const teamId = process.env.VERCEL_TEAM;
+    let deploymentUrl = '';
+    for await (const event of createDeployment({
+      token: vercelToken,
+      path: tempDir,
+      teamId: teamId || undefined,
+      projectName: repoName,
+      force: true,
+    })) {
+      if (event.type === 'ready') {
+        deploymentUrl = event.payload.url;
+      } else if (event.type === 'error') {
+        throw event.payload;
+      }
+    }
+    liveUrl = deploymentUrl;
+  } finally {
+    await fs.rm(tempDir, { recursive: true, force: true });
+  }
   // 3. Package the workspace into a ZIP archive
   const archive = archiver('zip', { zlib: { level: 9 } });
   const buffers: Buffer[] = [];
