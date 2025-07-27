@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
@@ -38,7 +38,7 @@ app.use(express.json());
 
 // POST /api/research
 // Returns an array of validated app ideas scraped from external sites
-app.post('/api/research', async (_req, res) => {
+app.post('/api/research', async (_req: Request, res: Response) => {
   try {
     const ideas = await getMarketIdeas();
     res.json({ ideas });
@@ -50,7 +50,7 @@ app.post('/api/research', async (_req, res) => {
 
 // POST /api/specification
 // Expects { idea: string } in body.  Returns a detailed specification for the given idea.
-app.post('/api/specification', async (req, res) => {
+app.post('/api/specification', async (req: Request, res: Response) => {
   const { idea } = req.body;
   if (!idea) {
     return res.status(400).json({ message: 'Missing idea string.' });
@@ -66,7 +66,7 @@ app.post('/api/specification', async (req, res) => {
 
 // POST /api/generate-code
 // Expects { spec: Specification } in body.  Returns a mapping of file paths to source code.
-app.post('/api/generate-code', async (req, res) => {
+app.post('/api/generate-code', async (req: Request, res: Response) => {
   const { spec } = req.body;
   if (!spec) {
     return res.status(400).json({ message: 'Missing specification.' });
@@ -83,7 +83,7 @@ app.post('/api/generate-code', async (req, res) => {
 // POST /api/deploy
 // Expects { code: Record<string,string>, repoName: string }
 // Creates a GitHub repository, commits the code, deploys to Vercel
-app.post('/api/deploy', async (req, res) => {
+app.post('/api/deploy', async (req: Request, res: Response) => {
   const { code, repoName } = req.body;
   if (!code || !repoName) {
     return res.status(400).json({ message: 'Missing code or repoName.' });
@@ -100,7 +100,7 @@ app.post('/api/deploy', async (req, res) => {
 // POST /api/qa
 // Expects { code: Record<string,string> }
 // Runs unit and end‑to‑end tests on the provided codebase
-app.post('/api/qa', async (req, res) => {
+app.post('/api/qa', async (req: Request, res: Response) => {
   const { code } = req.body;
   if (!code) {
     return res.status(400).json({ message: 'Missing code.' });
@@ -131,7 +131,7 @@ app.post('/api/qa', async (req, res) => {
   res.json({ jobId });
 });
 
-app.get('/api/qa/:id', (req, res) => {
+app.get('/api/qa/:id', (req: Request, res: Response) => {
   const job = qaJobs.get(req.params.id);
   if (!job) {
     return res.status(404).json({ message: 'Job not found.' });
@@ -145,7 +145,7 @@ app.get('/api/qa/:id', (req, res) => {
 // POST /api/listing
 // Expects { spec: any, liveUrl: string }
 // Generates a marketplace listing for the app
-app.post('/api/listing', async (req, res) => {
+app.post('/api/listing', async (req: Request, res: Response) => {
   const { spec, liveUrl } = req.body;
   if (!spec || !liveUrl) {
     return res.status(400).json({ message: 'Missing spec or liveUrl.' });
@@ -179,7 +179,7 @@ app.post('/api/listing', async (req, res) => {
 
 // GET /api/analytics/:appId
 // Retrieves analytics and usage metrics for a deployed app
-app.get('/api/analytics/:appId', async (req, res) => {
+app.get('/api/analytics/:appId', async (req: Request, res: Response) => {
   const { appId } = req.params;
   try {
     const metrics = await getAnalytics(appId);
