@@ -19,9 +19,9 @@ Copy `.env.example` to `.env` in the repository root and fill in the required ke
 
 Key variables include:
 
-- `FLIPPA_API_KEY` – authentication token for creating listings on Flippa.
-- `FLIPPA_API_URL` – base URL of the Flippa API used when posting listings.
-- `INTERNAL_MARKETPLACE_URL` – URL of the private marketplace where generated apps are published.
+- `FLIPPA_API_KEY` – the personal API token used to create listings on Flippa. Generate this key from your Flippa account and place it in the `.env` file.
+- `FLIPPA_API_URL` – the base URL of the Flippa listing API. The default `https://api.flippa.com/v3/listings` works for production but can be adjusted if Flippa provides an alternative endpoint.
+- `INTERNAL_MARKETPLACE_URL` – the root address of your internal marketplace where generated apps are published. Set it to your own marketplace’s URL in the `.env` file.
 
 ### Running the backend
 
