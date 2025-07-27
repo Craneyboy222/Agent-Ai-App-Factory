@@ -23,7 +23,7 @@ import { runTests } from '../../agents/qa';
 import { generateListing, createFlippaListing, createInternalListing } from '../../agents/marketplace';
 import { getAnalytics } from '../../agents/feedback';
 
-const app = express();
+export const app = express();
 
 interface QaJob {
   output: string[];
@@ -192,6 +192,8 @@ app.get('/api/analytics/:appId', async (req: Request, res: Response) => {
 
 // Start server
 const PORT = Number(process.env.PORT) || 4000;
-app.listen(PORT, () => {
-  console.log(`Backend server listening on port ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Backend server listening on port ${PORT}`);
+  });
+}

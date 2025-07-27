@@ -27,6 +27,8 @@ npm install
 ```
 
 2. Copy `.env.example` to `.env` in the repository root and fill in the required values.
+   The frontend expects `NEXT_PUBLIC_API_BASE_URL` to point at the running backend
+   (default `http://localhost:4000`).
 
 ## Running the backend
 
@@ -45,6 +47,33 @@ npm run dev
 ```
 
 The frontend runs on <http://localhost:3000> in development mode.
+
+## Run both workspaces
+
+From the monorepo root you can start backend and frontend together:
+
+```bash
+npm run dev
+```
+
+## License
+
+This project is released under the [MIT](../LICENSE) license.
+
+### Supabase setup
+
+Create a stored procedure named `get_app_metrics` that aggregates analytics for
+an app. A basic example:
+
+```sql
+create or replace function get_app_metrics(app_id uuid)
+returns table(page_views bigint, users bigint) as $$
+  select sum(page_views), count(distinct user_id)
+  from analytics where app_id = get_app_metrics.app_id;
+$$ language sql;
+```
+
+Modify the query to match your own `analytics` table structure.
 
 ## Building for production
 
