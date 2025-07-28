@@ -1,4 +1,4 @@
-name: CI
+name: Node.js CI
 on:
   push:
     branches: [main]
@@ -16,6 +16,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
+          cache-dependency-path: agent-ai-app-factory-finalized-6/package-lock.json
       - run: npm install
+        working-directory: agent-ai-app-factory-finalized-6
+      - run: npm audit --audit-level=high
+        working-directory: agent-ai-app-factory-finalized-6
       - run: npm --workspace backend test
+        working-directory: agent-ai-app-factory-finalized-6
       - run: npm --workspace frontend test
+        working-directory: agent-ai-app-factory-finalized-6
