@@ -17,5 +17,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - run: npm install
+      - run: npm audit --audit-level=high
       - run: npm --workspace backend test
       - run: npm --workspace frontend test
