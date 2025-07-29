@@ -12,8 +12,14 @@ interface Listing {
   internalUrl?: string;
 }
 
+// OpenAI client is initialised from the environment API key.  Warn when missing
+// so the module can still be imported during tests.
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+  console.warn('OPENAI_API_KEY not set - listing generation will fail');
+}
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey || '',
 });
 
 /**

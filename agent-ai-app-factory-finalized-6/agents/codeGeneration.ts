@@ -1,9 +1,14 @@
 import OpenAI from 'openai';
 import { Specification } from './specification';
 
-// Set up OpenAI client with API key from environment
+// Initialise an OpenAI client from the API key in the environment. Warn when
+// the key is missing so tests can still run without failing immediately.
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+  console.warn('OPENAI_API_KEY not set - code generation will fail');
+}
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey || '',
 });
 
 /**

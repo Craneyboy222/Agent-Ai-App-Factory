@@ -18,6 +18,9 @@ Agents live in the top‑level `agents` directory so they can be imported by bot
 Other environment variables are optional but recommended for deployment and marketplace integrations. See `.env.example` for the full list.
 The `APIFY_API_TOKEN` variable allows the market research agent to query the Apify Flippa actor for current listings.
 The `ZENSERP_API_KEY` variable enables the Google Trends scraper to call Zenserp for trending data.
+The `OPENAI_API_KEY` variable must be set with your OpenAI API key for specification,
+code generation and listing agents to operate. Do **not** commit this key to
+source control; store it in your local `.env` file.
 
 ## Installation
 
@@ -30,7 +33,8 @@ npm install
 
 2. Copy `.env.example` to `.env` in the repository root and fill in the required values.
    The frontend expects `NEXT_PUBLIC_API_BASE_URL` to point at the running backend
-   (default `http://localhost:4000`).
+   (default `http://localhost:4000`). When this variable is omitted in development
+   the Next.js app rewrites `/api/*` requests to `http://localhost:4000` automatically.
 
 ## Running the backend
 
