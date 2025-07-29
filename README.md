@@ -71,6 +71,22 @@ $$ language sql;
 Ensure your database has an `analytics` table with `app_id`, `user_id` and
 `page_views` columns or adjust the query accordingly.
 
+### Building for production
+
+Build the backend and frontend before deploying:
+
+```bash
+# Backend
+cd backend
+npm run build
+
+# Frontend
+cd ../frontend
+npm run build
+```
+
+After building you can start each service with `npm start`.
+
 ### License
 
 Released under the [MIT](LICENSE) license.
