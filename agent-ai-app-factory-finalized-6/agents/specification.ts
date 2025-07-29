@@ -1,3 +1,4 @@
+// Use the default OpenAI client in v4+
 import OpenAI from 'openai';
 
 export interface Specification {
@@ -9,10 +10,14 @@ export interface Specification {
   techStack: string;
 }
 
-// Initialise an OpenAI client using the API key from the environment.  The
-// environment variable OPENAI_API_KEY must be set when running the backend.
+// Initialise an OpenAI client using the API key from the environment.
+// If the key is missing, warn but allow the module to load so tests can run.
+const apiKey = process.env.OPENAI_API_KEY;
+if (!apiKey) {
+  console.warn('OPENAI_API_KEY not set - specification generation will fail');
+}
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: apiKey || '',
 });
 
 /**

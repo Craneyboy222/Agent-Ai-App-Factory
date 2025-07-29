@@ -29,7 +29,8 @@ export interface AppIdea {
 export async function scrapeFlippa(): Promise<AppIdea[]> {
   const token = process.env.APIFY_API_TOKEN;
   if (!token) {
-    throw new Error('Missing APIFY_API_TOKEN');
+    console.warn('Missing APIFY_API_TOKEN, skipping Flippa scrape');
+    return [];
   }
   try {
     const url =

@@ -11,8 +11,10 @@ describe('scrapeFlippa', () => {
     delete process.env.APIFY_API_TOKEN;
   });
 
-  it('throws when token missing', async () => {
-    await expect(scrapeFlippa()).rejects.toThrow('Missing APIFY_API_TOKEN');
+  it('returns empty array when token missing', async () => {
+    const ideas = await scrapeFlippa();
+    expect(ideas).toEqual([]);
+    expect(mockedAxios.get).not.toHaveBeenCalled();
   });
 
   it('fetches listings from Apify', async () => {
